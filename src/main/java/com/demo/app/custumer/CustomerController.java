@@ -38,9 +38,17 @@ public class CustomerController {
 		return mav;
 	}
 	
-	@RequestMapping("/home")
-	public String adentro() {
+	@RequestMapping(value = "/home", method =RequestMethod.GET)
+	public String adentro(ModelMap model) {
+		model.put("usuario", new Usuario());
 		return "home";
+	}
+
+	
+	@RequestMapping(value = "/logout", method =  RequestMethod.GET)
+	public String logOut(ModelMap model, HttpSession session) {
+		session.removeAttribute("usuario");
+		return "redirect:/";
 	}
 	
 	@RequestMapping("/")
@@ -58,8 +66,9 @@ public class CustomerController {
 	
 	@RequestMapping(value="/iniciar" , method = RequestMethod.POST)
 	public String Inicio(ModelMap model,@ModelAttribute("usuario")Usuario usuario, HttpSession session) {
-		if(usuario.getCorreo()!=null && usuario.getContrasenia()!=null && session.getAttribute("usuario")==null) {
+
 			usuario= CustomerService.validar(usuario.getNombreUsuario(), usuario.getContrasenia());
+			
 			if(usuario!=null) {
 				session.setAttribute("usuario", usuario);
 				return "redirect:home";
@@ -67,9 +76,7 @@ public class CustomerController {
 				model.put("falied", "Login Falied");
 				return "iniciar";
 			}
-		}else {
-			return "redirect:home";
-		}
+
 	
 		
 	}
